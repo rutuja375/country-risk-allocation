@@ -5,6 +5,7 @@ Compare country-level returns from US-listed ETFs and USD-converted local indice
 | Folder | Contents |
 | --- | --- |
 | `scripts/` | Market data collection, analysis, and plotting scripts |
+| `docs/` | Static GitHub Pages dashboard for exploring the results |
 | `data/` | Daily and monthly market data CSVs used by the analysis |
 | `outputs/tables/` | Correlation matrices, allocation comparisons, and sensitivity results |
 | `outputs/charts/` | Heatmaps, allocation comparisons, and efficient frontiers |
@@ -29,3 +30,7 @@ python scripts/plot_tangency_sensitivity.py
 ```
 
 To refresh the underlying datasets and Excel exports, run `python scripts/country_total_return_usd.py` and `python scripts/country_index_usd.py`. These two scripts request historical data from Yahoo Finance.
+
+## Dashboard
+
+Open `docs/index.html` in a browser. To regenerate the embedded chart data after rerunning the analysis, run `python scripts/build_dashboard.py`. For GitHub Pages, select `main` and `/docs` as the branch and folder to publish.
