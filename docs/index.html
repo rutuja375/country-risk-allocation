@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Explore efficient frontiers, country weights, and market correlations across 12 country equity markets.">
+<meta name="description" content="Explore efficient frontiers, country weights, market correlations, and historical shocks across country equity markets.">
 <title>Country Risk Allocation</title>
 <style>
 :root{color-scheme:light;--ink:#182525;--muted:#526460;--teal:#007466;--plum:#794373;--line:#d5dfdb;--paper:#f1f5f2;--white:#fff;--soft:#e3f0e9}
@@ -76,6 +76,13 @@ thead th{color:var(--muted);font-weight:650;border-bottom:1px solid var(--line)}
 .reading{margin:15px 0 0;border-top:1px solid #cbd8d0;padding-top:14px;color:var(--muted);font-size:.88rem}
 .reading summary{cursor:pointer;color:var(--ink);font-weight:650}
 .reading p{margin-top:5px;max-width:950px}
+.shock-layout{display:grid;gap:14px;padding-top:16px}
+.shock-layout .card h3{font:1.35rem/1.2 Georgia,serif}
+.shock-figure{margin:10px 0 0}
+.shock-figure img{display:block;width:100%;max-width:960px;height:auto}
+.shock-figure figcaption{max-width:78ch}
+.shock-figure figcaption p{margin-top:8px}
+.shock-sources{font-size:.85rem;color:var(--muted)}
 [hidden]{display:none!important}
 @media(max-width:950px){.wrap{width:calc(100% - 36px)}.card{padding:15px}.layout{grid-template-columns:minmax(0,1.65fr) minmax(235px,1fr)}}
 @media(max-width:690px){.layout{grid-template-columns:1fr}.wrap{width:calc(100% - 24px)}.top .wrap{padding:17px 0 22px}h1{margin-top:15px}.workspace{padding-top:12px}.controls{gap:10px 13px}.weight{grid-template-columns:minmax(102px,1fr) minmax(70px,2fr) 46px}nav button{padding-inline:9px}}
@@ -95,8 +102,9 @@ thead th{color:var(--muted);font-weight:650;border-bottom:1px solid var(--line)}
     <button data-view="correlation" aria-pressed="false">Correlations</button>
     <button data-view="allocation" aria-pressed="false">MVO weights</button>
     <button data-view="sensitivity" aria-pressed="false">Sensitivity</button>
+    <button data-view="market-shocks" aria-pressed="false">Market shocks</button>
   </nav>
-  <div class="controls">
+  <div class="controls" id="analysis-controls">
     <div id="dataset-control" class="control">
       <span id="dataset-label">Dataset</span>
       <div class="segmented" role="group" aria-labelledby="dataset-label">
@@ -156,6 +164,50 @@ thead th{color:var(--muted);font-weight:650;border-bottom:1px solid var(--line)}
     <div class="table-scroll" tabindex="0" aria-label="Scrollable sensitivity matrix"><table class="matrix" id="sensitivity-table"></table></div>
     <p class="note">Darker cells indicate a larger weight. Countries that retain a meaningful weight across settings rely less on a single choice of lookback or shrinkage.</p>
   </section>
+  <section id="market-shocks" class="shock-layout" aria-labelledby="market-shocks-heading" hidden>
+    <header>
+      <h2 id="market-shocks-heading">How the ETF portfolio behaved under stress</h2>
+      <p class="sub">The charts apply the same ten-year ETF weights retrospectively. The weights were estimated on 488 matched ETF and index weeks, with 50% return shrinkage and a 20% country cap. The weekly charts show all 522 available ETF weeks.</p>
+    </header>
+    <article class="card">
+      <h3>Weekly returns</h3>
+      <figure class="shock-figure">
+        <a href="charts/weekly-returns.png" aria-label="Open the weekly portfolio returns chart at full size">
+          <img src="charts/weekly-returns.png" width="1728" height="768" alt="Weekly USD returns from 2016 to 2026. Major moves include minus 13.4% in March 2020, plus 11.0% in April 2020 and minus 7.5% in April 2025.">
+        </a>
+        <figcaption>
+          <p><strong>What happened.</strong> All 12 country ETFs fell in the week ending March 20, 2020, as COVID-19 disrupted the global economy. The portfolio lost <strong>13.37%</strong> that week and gained <strong>11.01%</strong> in the week ending April 10 as policy support helped stabilize markets. U.S. tariff announcements triggered a <strong>7.53%</strong> loss in early April 2025. A tariff pause was followed by a <strong>4.30%</strong> rebound the next week.</p>
+          <p><strong>What we infer.</strong> Japan fell just <strong>2.51%</strong> in the worst COVID week, but every holding still moved down. The 2025 rebound left the portfolio <strong>3.55% down across the two weeks</strong>.</p>
+          <p class="shock-sources"><a href="https://www.imf.org/en/publications/gfsr/issues/2020/04/14/global-financial-stability-report-april-2020">IMF on the COVID-19 sell-off</a> · <a href="https://www.ecb.europa.eu/press/financial-stability-publications/fsr/html/ecb.fsr202505~0cde5244f6.en.html">ECB on the April 2025 tariff shock</a></p>
+        </figcaption>
+      </figure>
+    </article>
+    <article class="card">
+      <h3>Drawdown and recovery</h3>
+      <figure class="shock-figure">
+        <a href="charts/portfolio-drawdown.png" aria-label="Open the portfolio drawdown chart at full size">
+          <img src="charts/portfolio-drawdown.png" width="1728" height="768" alt="The portfolio fell 33.3% below its peak in March 2020 and 22.7% below its peak in October 2022. The 2022 recovery took longer.">
+        </a>
+        <figcaption>
+          <p><strong>What happened.</strong> The COVID-19 crash left the portfolio <strong>33.25% below its previous high</strong> in March 2020. It recovered that high in November. In 2022, inflation, higher interest rates, and energy disruption following Russia’s invasion of Ukraine pressured markets. The portfolio reached <strong>22.66% below its November 2021 high</strong> in October 2022 and regained that high in January 2024.</p>
+          <p><strong>What we infer.</strong> The 2020 loss was deeper, but the 2022 decline kept the portfolio below its prior high for much longer. Both the size of the loss and the time it takes to recover matter for judging the allocation.</p>
+          <p class="shock-sources"><a href="https://www.imf.org/en/publications/gfsr/issues/2022/10/11/global-financial-stability-report-october-2022">IMF on inflation, tightening, and energy risks in 2022</a></p>
+        </figcaption>
+      </figure>
+    </article>
+    <article class="card">
+      <h3>Calendar-month patterns</h3>
+      <figure class="shock-figure">
+        <a href="charts/monthly-seasonality.png" aria-label="Open the calendar-month returns chart at full size">
+          <img src="charts/monthly-seasonality.png" width="1728" height="768" alt="Average portfolio returns for each calendar month. November leads at plus 3.39%, while March averages minus 1.02%.">
+        </a>
+        <figcaption>
+          <p><strong>What happened.</strong> November averaged <strong>+3.39%</strong> and was positive in eight of ten years. March averaged <strong>−1.02%</strong>, but removing March 2020 changes its average to <strong>+0.66%</strong>.</p>
+          <p><strong>What we infer.</strong> One exceptional month can change the apparent pattern. With ten observations per calendar month, these averages are too sensitive to individual events to justify timing an allocation.</p>
+        </figcaption>
+      </figure>
+    </article>
+  </section>
   <details class="reading">
     <summary>Method and data</summary>
     <p>The models use matched Friday-ending USD returns and annualize weekly means and covariance using 52 weeks. Shrinkage pulls each country’s estimated return toward the cross-country average. Portfolios are fully invested and long only. The frontier’s highlighted portfolio maximizes expected return divided by volatility, using a zero risk-free rate.</p>
@@ -175,7 +227,7 @@ const countryCodes = {
 };
 const labels = {etf:"U.S. ETFs", index:"Local indices (USD)"};
 const colors = {etf:"#007466", index:"#794373"};
-const views = ["frontier", "correlation", "allocation", "sensitivity"];
+const views = ["frontier", "correlation", "allocation", "sensitivity", "market-shocks"];
 const $ = id => document.getElementById(id);
 const pct = (value, digits = 2) => value.toFixed(digits) + "%";
 const esc = value => String(value).replace(/[&<>"']/g, char => ({
@@ -186,7 +238,7 @@ const endDate = new Intl.DateTimeFormat("en-US", {
 }).format(new Date(data.endDate));
 
 let dataset = "etf";
-let view = "frontier";
+let view = location.hash === "#market-shocks" ? "market-shocks" : "frontier";
 
 function scenarioKey() {
   return $("lookback").value + "-" + $("shrinkage").value;
@@ -328,6 +380,7 @@ function selectPortfolio(index) {
 
 function renderView() {
   for (const id of views) $(id).hidden = id !== view;
+  $("analysis-controls").hidden = view === "market-shocks";
   for (const control of document.querySelectorAll("[data-controls]")) {
     control.hidden = control.dataset.controls !== view;
   }
@@ -337,7 +390,7 @@ function renderView() {
   document.querySelectorAll("[data-dataset]").forEach(button =>
     button.setAttribute("aria-pressed", button.dataset.dataset === dataset));
   ({frontier:renderFrontier, correlation:renderCorrelations,
-    allocation:renderAllocation, sensitivity:renderSensitivity})[view]();
+    allocation:renderAllocation, sensitivity:renderSensitivity})[view]?.();
 }
 
 document.querySelectorAll("[data-view]").forEach(button => button.addEventListener("click", () => {

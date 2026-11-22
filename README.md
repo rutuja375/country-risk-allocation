@@ -34,3 +34,5 @@ To refresh the underlying datasets and Excel exports, run `python scripts/countr
 ## Dashboard
 
 Open `docs/index.html` in a browser. To regenerate the embedded chart data after rerunning the analysis, run `python scripts/build_dashboard.py`. For GitHub Pages, select `main` and `/docs` as the branch and folder to publish.
+
+The **Market shocks** tab uses three separate images in `docs/charts/`. Run `python scripts/plot_market_shocks.py` to regenerate them and open the three Matplotlib figures. Add `--save-only` to regenerate the images without opening windows.
