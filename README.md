@@ -49,9 +49,11 @@ python scripts/compare_theme_allocations.py
 
 - **Chips:** 2024 integrated-circuit trade (HS 8542) from [UN Comtrade via WITS](https://wits.worldbank.org/trade/comtrade/en/country/ALL/year/2024/tradeflow/Imports/partner/WLD/product/8542), scaled by 2024 [World Bank GDP](https://datacatalogfiles.worldbank.org/ddh-published/0038130/DR0046441/GDP.pdf). Supplier shares exclude aggregate and unspecified partner rows from the supplier selection and use total reported imports as the denominator.
 - **Data centers:** Rounded-down estimates of energized capacity from [DC Atlas](https://dcatlas.io/en/answers/data-center-capacity), retrieved November 2026. The estimates cover all uses, and source coverage varies.
-- **Oil:** The 12 largest increases and decreases in monthly average [Brent prices](https://fred.stlouisfed.org/series/MCOILBRENTEU) over the 120-month sample. Fund-provider Energy weights are dated snapshots. The allocation comparison tests shifting five percentage points from Canada to USD cash.
+- **Oil:** The 12 largest increases and decreases in monthly average [Brent prices](https://fred.stlouisfed.org/series/MCOILBRENTEU) over the 120-month sample. Fund-provider Energy weights are dated snapshots. The allocation comparison tests shifting two percentage points from Canada to USD cash.
 - **War events:** Two named events using USD ETF prices from the last close before the event to the fifth US trading session on or after it. These are separate historical examples.
 - **Gold:** The same oil months with 5% of the fixed portfolio shifted proportionally to [GLD](https://www.digrin.com/stocks/detail/GLD/price) or zero-return USD cash. Each observation starts at the stated weights and omits trading costs.
+
+After regenerating the tables, run `python scripts/build_theme_analysis.py` to refresh the dashboard's `docs/theme-data.js`.
 
 ## Country-risk data
 

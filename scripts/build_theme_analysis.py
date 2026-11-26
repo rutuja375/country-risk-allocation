@@ -91,10 +91,14 @@ def main():
     gold = changes.gld_adjusted_close_usd
     mix = monthly @ weights
     oil = []
-    for label, selected in (("Largest Brent rises", brent.nlargest(12)), ("Largest Brent falls", brent.nsmallest(12))):
+    for label, window, selected in (
+        ("Largest Brent rises", "Brent up", brent.nlargest(12)),
+        ("Largest Brent falls", "Brent down", brent.nsmallest(12)),
+    ):
         months = selected.index
         oil.append({
             "label": label,
+            "window": window,
             "firstCutoffPct": round(float(100 * selected.iloc[-1]), 4),
             "returnsPct": (100 * monthly.loc[months, weights.index].mean()).round(6).tolist(),
             "months": [{
@@ -129,7 +133,14 @@ def main():
         write_review_tables(inputs, wars)
         return
 
-    data = {"countries": inputs.to_dict(orient="records"), "oil": oil, "wars": wars}
+    allocation_tables = {}
+    for key in ("summary", "weights"):
+        table = pd.read_csv(TABLES_DIR / f"theme_allocation_{key}.csv")
+        allocation_tables[key] = json.loads(table.to_json(orient="records"))
+    data = {
+        "countries": inputs.to_dict(orient="records"), "oil": oil, "wars": wars,
+        "allocations": allocation_tables,
+    }
     payload = json.dumps(data, ensure_ascii=False, allow_nan=False, separators=(",", ":"))
     path = PROJECT_ROOT / "docs" / "theme-data.js"
     path.write_text(f"const themeData = {payload};\n", encoding="utf-8")
