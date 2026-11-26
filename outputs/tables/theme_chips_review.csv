@@ -1,0 +1,13 @@
+country,portfolio_weight_pct,imports_pct_gdp,exports_pct_gdp,top_reported_partner,top_partner_share_pct,chip_imports_thousand_usd,chip_exports_thousand_usd,gdp_million_usd,chip_partner_source,trade_year
+United States,20.000000,0.143808,0.178230,"Other Asia, nes",27.594840,41346204.160000,51242866.010000,28750956,https://wits.worldbank.org/trade/comtrade/en/country/USA/year/2024/tradeflow/Imports/partner/ALL/product/8542,2024
+Canada,20.000000,0.079452,0.030424,United States,18.890785,1782621.240000,682600.170000,2243637,https://wits.worldbank.org/trade/comtrade/en/country/CAN/year/2024/tradeflow/Imports/partner/ALL/product/8542,2024
+United Kingdom,5.927214,0.063419,0.030129,"Other Asia, nes",21.743008,2337639.710000,1110561.770000,3686033,https://wits.worldbank.org/trade/comtrade/en/country/GBR/year/2024/tradeflow/Imports/partner/ALL/product/8542,2024
+Germany,0.000000,0.411706,0.410968,"Other Asia, nes",22.125250,19290855.710000,19256277.040000,4685593,https://wits.worldbank.org/trade/comtrade/en/country/DEU/year/2024/tradeflow/Imports/partner/ALL/product/8542,2024
+Japan,20.000000,0.603355,0.807301,"Other Asia, nes",56.510063,24300697.100000,32514849.570000,4027598,https://wits.worldbank.org/trade/comtrade/en/country/JPN/year/2024/tradeflow/Imports/partner/ALL/product/8542,2024
+Australia,4.353951,0.030692,0.005915,"Other Asia, nes",19.951851,539259.350000,103936.290000,1757022,https://wits.worldbank.org/trade/comtrade/en/country/AUS/year/2024/tradeflow/Imports/partner/ALL/product/8542,2024
+India,20.000000,0.601429,0.009222,China,44.902247,23515229.780000,360565.230000,3909892,https://wits.worldbank.org/trade/comtrade/en/country/IND/year/2024/tradeflow/Imports/partner/ALL/product/8542,2024
+China,4.072786,2.062230,0.862101,"Other Asia, nes",36.197379,386540311.090000,161590484.830000,18743803,https://wits.worldbank.org/trade/comtrade/en/country/CHN/year/2024/tradeflow/Imports/partner/ALL/product/8542,2024
+Brazil,0.000000,0.273619,0.009702,China,28.557624,5980827.970000,212064.460000,2185822,https://wits.worldbank.org/trade/comtrade/en/country/BRA/year/2024/tradeflow/Imports/partner/ALL/product/8542,2024
+Mexico,5.646049,1.396447,0.197883,Malaysia,23.348293,25923160.250000,3673427.820000,1856366,https://wits.worldbank.org/trade/comtrade/en/country/MEX/year/2024/tradeflow/Imports/partner/ALL/product/8542,2024
+Indonesia,0.000000,0.295931,0.053481,"Other Asia, nes",25.866720,4132080.110000,746749.980000,1396300,https://wits.worldbank.org/trade/comtrade/en/country/IDN/year/2024/tradeflow/Imports/partner/ALL/product/8542,2024
+South Africa,0.000000,0.065429,0.009155,China,43.846100,262465.990000,36726.600000,401145,https://wits.worldbank.org/trade/comtrade/en/country/ZAF/year/2024/tradeflow/Imports/partner/ALL/product/8542,2024

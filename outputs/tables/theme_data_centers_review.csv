@@ -1,0 +1,13 @@
+country,portfolio_weight_pct,live_data_center_mw_rounded_down,snapshot_month,source
+United States,20.000000,35000,2026-11,https://dcatlas.io/en/answers/data-center-capacity
+Canada,20.000000,1700,2026-11,https://dcatlas.io/en/answers/data-center-capacity
+United Kingdom,5.927214,2300,2026-11,https://dcatlas.io/en/answers/data-center-capacity
+Germany,0.000000,1900,2026-11,https://dcatlas.io/en/answers/data-center-capacity
+Japan,20.000000,1500,2026-11,https://dcatlas.io/en/answers/data-center-capacity
+Australia,4.353951,2100,2026-11,https://dcatlas.io/en/answers/data-center-capacity
+India,20.000000,1200,2026-11,https://dcatlas.io/en/answers/data-center-capacity
+China,4.072786,5700,2026-11,https://dcatlas.io/en/answers/data-center-capacity
+Brazil,0.000000,1100,2026-11,https://dcatlas.io/en/answers/data-center-capacity
+Mexico,5.646049,370,2026-11,https://dcatlas.io/en/answers/data-center-capacity
+Indonesia,0.000000,890,2026-11,https://dcatlas.io/en/answers/data-center-capacity
+South Africa,0.000000,470,2026-11,https://dcatlas.io/en/answers/data-center-capacity
