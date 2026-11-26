@@ -12,8 +12,10 @@ from compare_weekly_correlations import (
     load_weekly_returns,
 )
 from project_paths import CHARTS_DIR, DATA_DIR
+from etf_tangency_sensitivity import max_return_to_volatility
 
-def solve_frontier(sample, shrinkage=MEAN_SHRINKAGE, point_count=201):
+
+def solve_frontier(sample, shrinkage=MEAN_SHRINKAGE, point_count=201, *, group_cap=None):
     """Return frontier coordinates, corresponding weights, and reference portfolios."""
     raw = sample.mean().to_numpy() * WEEKS_PER_YEAR
     mu = (1 - shrinkage) * raw + shrinkage * raw.mean()
@@ -22,6 +24,15 @@ def solve_frontier(sample, shrinkage=MEAN_SHRINKAGE, point_count=201):
     unit = np.ones(n)
     bounds = [(0, COUNTRY_CAP)] * n
     budget = {"type": "eq", "fun": lambda w: unit @ w - 1, "jac": lambda w: unit}
+    constraints = [budget]
+    cap_args = {}
+    if group_cap is not None:
+        countries, limit = group_cap
+        members = sample.columns.isin(countries).astype(float)
+        cap_args = {"A_ub": members[None, :], "b_ub": [limit]}
+        constraints.append({
+            "type": "ineq", "fun": lambda w: limit - members @ w, "jac": lambda w: -members,
+        })
     opts = {"ftol": 1e-12, "maxiter": 600}
 
     def variance(w):
@@ -30,25 +41,13 @@ def solve_frontier(sample, shrinkage=MEAN_SHRINKAGE, point_count=201):
     def grad(w):
         return 2 * (cov @ w)
 
-    minvar = minimize(variance, unit / n, jac=grad, bounds=bounds, constraints=[budget], method="SLSQP", options=opts)
-    maxret = linprog(-mu, A_eq=unit[None, :], b_eq=[1], bounds=bounds, method="highs")
-    assert minvar.success and maxret.success
-
-    # Normalize excess-free return to a positive constant via a scale-free
-    # variable. This makes the maximum return/sigma search a convex QP.
-    scaled_mu = mu / 0.1
-    cap_matrix = COUNTRY_CAP * np.ones((n, n)) - np.eye(n)
-    normalized = minimize(
-        variance, minvar.x / (scaled_mu @ minvar.x), jac=grad,
-        bounds=[(0, None)] * n,
-        constraints=[
-            {"type": "eq", "fun": lambda y: scaled_mu @ y - 1, "jac": lambda y: scaled_mu},
-            {"type": "ineq", "fun": lambda y: cap_matrix @ y, "jac": lambda y: cap_matrix},
-        ],
-        method="SLSQP", options=opts,
+    tangency, _, _ = max_return_to_volatility(sample, shrinkage, group_cap=group_cap)
+    maxret = linprog(-mu, A_eq=unit[None, :], b_eq=[1], bounds=bounds, method="highs", **cap_args)
+    assert maxret.success, maxret.message
+    minvar = minimize(
+        variance, tangency, jac=grad, bounds=bounds, constraints=constraints, method="SLSQP", options=opts,
     )
-    assert normalized.success, normalized.message
-    tangency = normalized.x / normalized.x.sum()
+    assert minvar.success, minvar.message
 
     def point(w):
         return np.sqrt(variance(w)), mu @ w
@@ -61,6 +60,10 @@ def solve_frontier(sample, shrinkage=MEAN_SHRINKAGE, point_count=201):
     curve = []
     portfolios = []
     for target in targets:
+        if target == best[1]:
+            curve.append(best)
+            portfolios.append(tangency)
+            continue
         if target == extrema[0][1]:
             curve.append(extrema[0])
             portfolios.append(minvar.x)
@@ -72,11 +75,14 @@ def solve_frontier(sample, shrinkage=MEAN_SHRINKAGE, point_count=201):
         mix = (target - extrema[0][1]) / (extrema[1][1] - extrema[0][1])
         start = (1 - mix) * minvar.x + mix * maxret.x
         constraint = {"type": "eq", "fun": lambda w: mu @ w - target, "jac": lambda w: mu}
-        fit = minimize(variance, start, jac=grad, bounds=bounds, constraints=[budget, constraint], method="SLSQP", options=opts)
+        fit = minimize(
+            variance, start, jac=grad, bounds=bounds, constraints=[*constraints, constraint],
+            method="SLSQP", options=opts,
+        )
         assert fit.success, fit.message
         assert abs(mu @ fit.x - target) < 1e-8
         curve.append(point(fit.x))
-        portfolios.append(tangency if target == best[1] else fit.x)
+        portfolios.append(fit.x)
     vol, ret = np.asarray(curve).T
     assert np.all(np.diff(vol) > -1e-7)
     assert abs(np.max(ret / vol) - best[1] / best[0]) < 1e-6

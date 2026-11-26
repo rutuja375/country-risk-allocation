@@ -1,0 +1,5 @@
+state,profile,observations,countries,gross_government_debt_pct_gdp,government_balance_pct_gdp,current_account_balance_pct_gdp,political_stability_score,government_effectiveness_score,real_gdp_growth_pct,average_cpi_inflation_pct,debt_z,fiscal_balance_risk_z,current_account_risk_z,governance_risk_z
+A,Lower debt / Stronger fiscal balance,25,9,47.195677,-2.356904,-1.503468,65.121265,66.221736,2.714197,4.405240,-0.687908,-0.490791,0.205469,0.063296
+B,Stronger current account / Stronger fiscal balance,8,3,57.903867,-1.463546,5.284142,74.309075,77.441102,3.094650,2.369925,-0.347254,-0.764465,-1.758909,-0.458671
+C,Weaker fiscal balance / Higher debt,22,8,86.060383,-7.641335,-1.381518,63.627161,67.912075,2.450262,4.137123,0.548476,1.128058,0.170176,0.072480
+D,Higher debt / Stronger current account,5,1,190.952687,-5.562640,3.120300,85.415125,85.724095,-0.080293,0.599500,3.885365,0.491264,-1.132679,-0.975929

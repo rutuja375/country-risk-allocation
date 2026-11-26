@@ -1,0 +1,4 @@
+clusters,uncapped_inertia,uncapped_silhouette,capped_silhouette,same_assignments_after_cap,country_period_rows,smallest_uncapped_cluster
+3,112.228792,0.321026,0.323714,60,60,5
+4,86.033792,0.343243,0.348416,60,60,5
+5,70.381429,0.340203,0.349821,59,60,5

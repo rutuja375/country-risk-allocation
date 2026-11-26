@@ -4,7 +4,7 @@ from itertools import product
 
 import numpy as np
 import pandas as pd
-from scipy.optimize import minimize
+from scipy.optimize import linprog, minimize
 
 import compare_weekly_correlations as weekly
 from project_paths import DATA_DIR, TABLES_DIR
@@ -33,7 +33,8 @@ def load_matched_returns():
     return {"etf": etf.loc[matched], "index": index.loc[matched, etf.columns]}
 
 
-def max_return_to_volatility(returns, shrinkage):
+def max_return_to_volatility(returns, shrinkage, *, group_cap=None, country_caps=None):
+    """Solve for tangency with optional group and tighter individual caps."""
     means = returns.mean().to_numpy() * WEEKS_PER_YEAR
     expected = (1 - shrinkage) * means + shrinkage * means.mean()
     covariance = returns.cov().to_numpy() * WEEKS_PER_YEAR
@@ -45,16 +46,38 @@ def max_return_to_volatility(returns, shrinkage):
     # The return/volatility ratio is unchanged by positive scaling.
     # Fix scaled expected return and minimize variance, then normalize to 100%.
     scaled_returns = expected / 0.10
-    equal_weights = np.full(count, 1 / count)
-    initial_return = scaled_returns @ equal_weights
-    if initial_return <= 0:
-        raise ValueError("This solver expects a positive equal-weight return.")
+    individual_limits = np.full(count, COUNTRY_CAP)
+    for country, limit in (country_caps or {}).items():
+        if country not in returns.columns or not 0 <= limit <= COUNTRY_CAP:
+            raise ValueError(f"Invalid individual cap for {country}: {limit}.")
+        individual_limits[returns.columns.get_loc(country)] = limit
+    # Enforce scaled_weight[i] <= individual_limits[i] * sum(scaled_weights).
+    cap_matrix = individual_limits[:, None] - np.eye(count)
+    start = np.full(count, 1 / count)
+    if group_cap is not None:
+        countries, limit = group_cap
+        members = returns.columns.isin(countries).astype(float)
+        if not 0 <= limit <= 1 or not members.any() or set(countries) - set(returns.columns):
+            raise ValueError("Group cap requires known countries and a limit from 0 to 1.")
+        # Since w = y / sum(y), group_weight <= limit becomes
+        # sum(y in group) <= limit * sum(y).
+        cap_matrix = np.vstack((cap_matrix, limit - members))
+    if group_cap is not None or country_caps:
+        if np.any(cap_matrix @ start < -1e-12) or scaled_returns @ start <= 0:
+            feasible = linprog(
+                -scaled_returns, A_ub=-cap_matrix, b_ub=np.zeros(len(cap_matrix)),
+                A_eq=np.ones((1, count)), b_eq=[1], bounds=(0, None), method="highs",
+            )
+            if not feasible.success:
+                raise ValueError(f"Allocation constraints are infeasible: {feasible.message}")
+            start = feasible.x
 
-    # Enforce scaled_weight[i] <= country_cap * sum(scaled_weights).
-    cap_matrix = COUNTRY_CAP * np.ones((count, count)) - np.eye(count)
+    initial_return = scaled_returns @ start
+    if initial_return <= 0:
+        raise ValueError("This solver requires a positive expected return at the starting weights.")
     result = minimize(
         variance,
-        x0=equal_weights / initial_return,
+        x0=start / initial_return,
         jac=lambda y: 2 * covariance @ y,
         method="SLSQP",
         bounds=[(0, None)] * count,
@@ -70,8 +93,8 @@ def max_return_to_volatility(returns, shrinkage):
         raise RuntimeError(f"Tangency optimization failed: {result.message}")
 
     weights = result.x / result.x.sum()
-    if weights.min() < -1e-7 or weights.max() > COUNTRY_CAP + 1e-7:
-        raise RuntimeError("Tangency weights violate the country bounds.")
+    if not np.isfinite(weights).all() or weights.min() < -1e-7 or np.any(cap_matrix @ weights < -1e-7):
+        raise RuntimeError("Tangency weights violate the allocation bounds.")
 
     annual_return = expected @ weights
     annual_volatility = np.sqrt(variance(weights))

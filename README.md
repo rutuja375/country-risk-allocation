@@ -1,6 +1,6 @@
 # Country Risk Allocation
 
-Compare country-level returns from US-listed ETFs and USD-converted local indices. The analysis covers correlations, mean-variance allocations, efficient frontiers, and sensitivity to lookback windows and return shrinkage.
+The project proposes a $300 million country equity allocation across 12 markets. First, it compares market-only tangency portfolios for US-listed ETFs and USD-converted local indices. Then it uses country-risk states to test allocation limits and selects the ten-year ETF portfolio with a 50% State C cap.
 
 | Folder | Contents |
 | --- | --- |
@@ -15,7 +15,9 @@ Compare country-level returns from US-listed ETFs and USD-converted local indice
 
 From the project root, use the project virtual environment when available and install dependencies with `python -m pip install -r requirements.txt`.
 
-Run these commands in order to regenerate the analysis from the included market data. Plotting scripts save the chart and can open a plot window.
+The market-only model maximizes annual expected return divided by annual volatility. It is fully invested and long only, with a 20% cap per country. The matched weekly data run from November 2016 through October 2026. The sensitivity analysis uses 3-, 5-, and 10-year windows and 25%, 50%, and 75% mean shrinkage. The final recommendation uses ten-year ETF data and 50% mean shrinkage.
+
+To regenerate the market analysis from the included prices, run the following commands. The plotting scripts can open Matplotlib windows.
 
 ```text
 python scripts/compare_market_data.py
@@ -23,7 +25,6 @@ python scripts/plot_correlations.py
 python scripts/compare_weekly_correlations.py
 python scripts/plot_weekly_correlations.py
 python scripts/efficient_frontier.py
-python scripts/mvo_sensitivity.py
 python scripts/etf_tangency_sensitivity.py
 python scripts/index_tangency_sensitivity.py
 python scripts/plot_tangency_sensitivity.py
@@ -33,6 +34,26 @@ To refresh the underlying datasets and Excel exports, run `python scripts/countr
 
 ## Dashboard
 
-Open `docs/index.html` in a browser. To regenerate the embedded chart data after rerunning the analysis, run `python scripts/build_dashboard.py`. For GitHub Pages, select `main` and `/docs` as the branch and folder to publish.
+Open `docs/index.html` in a browser. The market tabs show market-only results. The Country risk tab shows standardized indicators, state assignments, the cap comparison, the constrained efficient frontier, final weights, and the GDP and inflation review. To regenerate the embedded chart data after rerunning the analysis, run `python scripts/build_dashboard.py`. GitHub Pages serves `/docs` from `main`.
 
 The **Market shocks** tab uses three separate images in `docs/charts/`. Run `python scripts/plot_market_shocks.py` to regenerate them and open the three Matplotlib figures. Add `--save-only` to regenerate the images without opening windows.
+
+## Country-risk data
+
+Build the historical country comparison in [the analysis plan](scripts/instructions.md) from `data/country_risk_data_2002_2025.xlsx`.
+
+```text
+python scripts/build_country_comparison.py --workbook data/country_risk_data_2002_2025.xlsx
+```
+
+The script validates the annual panel and writes `outputs/tables/country_factor_averages_by_period.csv`. Each row contains a country's seven indicator averages for one period: 2002–2007, 2008–2009, 2010–2019, 2020–2021, or 2022–2024. The two growth and inflation measures provide context for the five core risk factors. The historical rows come from the October 2026 IMF and 2026 World Bank releases linked below. The three 2025 rows flagged with IMF estimates fall outside the comparison periods.
+
+Run `python scripts/standardize_country_risk.py` to convert all 60 country-period rows to four comparable inputs in `outputs/tables/country_risk_standardized_by_period.csv`. The script uses pooled median and median absolute deviation, combines the two governance indicators after scaling them, and orients each column so higher values indicate more vulnerability on that dimension.
+
+Run `python scripts/cluster_country_risk.py` to compare three, four, and five K-means clusters and record the sensitivity to capping inputs at ±3. The reference fit uses four uncapped clusters because it has the highest uncapped silhouette score in this dataset and its assignments match the capped fit. See `outputs/tables/country_risk_state_migration.csv` for the period assignments and `outputs/tables/country_risk_state_profiles.csv` for the factor averages behind each descriptive state. Cluster letters identify profiles and carry no risk ranking.
+
+Run `python scripts/compare_state_c_cap.py` to reproduce the allocation trials. The State C countries are selected from the 2022–2024 assignments. The market-only portfolio allocated 60% to State C. The selected 50% cap moves $30 million from the UK and China to Australia and Mexico. The GDP and inflation review uses 2025 observations and each country's 2002–2025 annual medians. A 3% cap on Mexico was evaluated as a sensitivity test and was not adopted.
+
+### Source-release exports
+
+The workbook contains annual observations for 2002–2025. IMF fiscal-year labels follow the source conventions, so some reporting periods differ from calendar years. The workbook flags estimates. The indicator sources are the [IMF October 2026 World Economic Outlook](https://data.imf.org/datasets/WEO) and the [World Bank Worldwide Governance Indicators 2026 release](https://datacatalog.worldbank.org/search/dataset/0038026/worldwide-governance-indicators).
