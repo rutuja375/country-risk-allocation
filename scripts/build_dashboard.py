@@ -98,6 +98,7 @@ def build_data():
                 TABLES_DIR / f"{key}_correlation{suffix}_5y.csv", index_col=0
             )
             matrices[period] = frame.loc[countries, countries].round(4).values.tolist()
+        matrices["weekly-10"] = returns.loc[WINDOW_STARTS[10]:, countries].corr().round(4).values.tolist()
 
         data["datasets"][key] = {
             "scenarios": scenarios,
